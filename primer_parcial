@@ -1,0 +1,211 @@
+book_titles = []
+book_stocks = []
+
+menu = [
+    "0 - Salir",
+    "1 - Ingresar titulos",
+    "2 - Ingresar ejemplares",
+    "3 - Mostrar catalogo",
+    "4 - Consultar disponibilidad",
+    "5 - Listar agotados",
+    "6 - Agregar titulo",
+    "7 - Actualizar ejemplares (prestamo/devolucion)",
+]
+
+show_menu = True
+
+while show_menu:
+    for option in menu:
+        print(option)
+
+    selected_option = input("Opcion: ")
+
+    if selected_option.isdigit():
+        selected_option = int(selected_option)
+    else:
+        selected_option = -1
+
+    if selected_option == 0:
+        show_menu = False
+
+    # 1. Ingresar títulos
+    elif selected_option == 1:
+        if book_titles:
+            print("El catálogo ya tiene títulos")
+            continue
+
+        initial_books_quantity = input("Cantidad inicial de títulos: ")
+
+        if initial_books_quantity.isdigit():
+            initial_books_quantity = int(initial_books_quantity)
+
+            if initial_books_quantity > 0:
+                books_to_add = initial_books_quantity
+
+                while books_to_add > 0:
+                    book_title = input("Título: ").lower()
+
+                    if book_title == "":
+                        print("El título no puede estar vacío.")
+                    elif book_title in book_titles:
+                        print("Título ya ingresado.")
+                    else:
+                        book_titles.append(book_title)
+                        books_to_add -= 1
+
+                print("Títulos ingresados")
+            else:
+                print("La cantidad a ingresar debe ser mayor a 0")
+        else:
+            print("Ingrese una entrada numerica")
+
+    # 2. Ingresar ejemplares
+    elif selected_option == 2:
+        if not book_titles:
+            print("No hay titulos en catalogo")
+
+        elif len(book_titles) == len(book_stocks):
+            print("Todo el stock esta asignado")
+        else:
+            book_stocks.clear()
+            for book_title in book_titles:
+
+                valid_stock = False
+                while not valid_stock:
+                    book_stock = input(f"Stock para {book_title.title()}: ")
+
+                    if book_stock.isdigit():
+                        book_stock = int(book_stock)
+
+                        if book_stock >= 0:
+                            book_stocks.append(book_stock)
+                            valid_stock = True
+                        else:
+                            print("El stock debe ser mayor o igual a 0")
+                    else:
+                        print("El stock debe ser numerico")
+            print("Stock ingresado")
+
+    # 3. Mostrar catalogo
+    elif selected_option == 3:
+        if not book_titles:
+            print("Catalogo vacio")
+        else:
+            for i in range(len(book_titles)):
+                print(f"{book_titles[i]} | Stock: {book_stocks[i]}")
+
+    # 4. Consultar disponibilidad
+    elif selected_option == 4:
+        if not book_titles:
+            print("Catalogo vacio")
+            continue
+
+        book_title = input("Libro a consultar: ").lower()
+
+        if book_title not in book_titles:
+            print("Libro no encontrado")
+        else:
+            book_index = book_titles.index(book_title)
+            book_stock = book_stocks[book_index]
+            print(f"Stock de {book_title.title()}: {book_stock}")
+
+    # 5. Listar agotados
+    elif selected_option == 5:
+        if not book_titles:
+            print("Catalogo vacio")
+            continue
+
+        out_of_stock = False
+
+        for i in range(len(book_titles)):
+            if book_stocks[i] == 0:
+                print(book_titles[i].title())
+                out_of_stock = True
+
+        if not out_of_stock:
+            print("No hay libros agotados.")
+
+    # 6. Agregar titulo
+    elif selected_option == 6:
+        book_title = input("Titulo del nuevo libro: ").lower()
+
+        if book_title in book_titles:
+            print("Libro ya ingresado")
+        else:
+            valid_stock = False
+
+            while not valid_stock:
+
+                book_stock = input(f"Stock para {book_title.title()}: ")
+
+                if book_stock.isdigit():
+                    book_stock = int(book_stock)
+
+                    if book_stock >= 0:
+                        book_titles.append(book_title)
+                        book_stocks.append(book_stock)
+
+                        print("Libro agregado.")
+
+                        valid_stock = True
+                    else:
+                        print("Stock no puede ser negativo")
+                else:
+                    print("Ingrese un numero entero")
+
+    # 7. Actualizar ejemplares (Prestamo/Devolucion)
+    elif selected_option == 7:
+
+        if not book_titles:
+            print("Catalogo vacio")
+            continue
+
+        book_title = input("Titulo a actualizar: ").lower()
+
+        if book_title in book_titles:
+
+            book_index = book_titles.index(book_title)
+
+            current_stock = book_stocks[book_index]
+
+            print(f"Stock actual: {current_stock}")
+
+            option = input("Prestamo (p) o Devolucion (d): ").lower()
+
+            if option == "p":
+
+                if current_stock > 0:
+                    book_stocks[book_index] -= 1
+
+                    print(f"Stock: {book_stocks[book_index]}")
+                else:
+                    print("No hay libros para prestar")
+
+            elif option == "d":
+
+                is_valid = False
+
+                while not is_valid:
+                    amount_to_return = input("Cantidad a devolver: ")
+
+                    if amount_to_return.isdigit():
+                        amount_to_return = int(amount_to_return)
+
+                        if amount_to_return > 0:
+                            book_stocks[book_index] += amount_to_return
+                            print(f" Stock: {book_stocks[book_index]}")
+                            is_valid = True
+                        else:
+                            print("Cantidad debe ser positiva")
+                    else:
+                        print("Ingrese un numero entero")
+
+            else:
+                print("Opcion no valida")
+
+        else:
+            print("Libro no encontrado")
+
+    # Opcion no reconocida
+    else:
+        print("Opcion no reconocida")
